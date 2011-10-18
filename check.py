@@ -3,6 +3,7 @@
 import cookielib
 import re
 import requests
+import sys
 
 requests.settings(timeout=5.0)
 
