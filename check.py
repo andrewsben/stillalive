@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cookielib
 import re
 import requests
@@ -43,7 +45,15 @@ def dash(url, tenant='admin', user='admin', password='secrete'):
 
 
 if __name__ == '__main__':
-    host = 'dev2.rcb.me'
+    host = sys.argv[1]
     url = 'http://' + host
-    dash(url)
+    tenant = user = password = None
+    if len(sys.argv) >= 2:
+        tenant = sys.argv[2]
+    if len(sys.argv) >= 3:
+        user = sys.argv[3]
+    if len(sys.argv) >= 4:
+        password = sys.argv[4]
+
+    dash(url, tenant, user, password)
 
