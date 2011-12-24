@@ -28,7 +28,6 @@ def dash(url, tenant='admin', user='admin', password='secrete'):
             'password': password}
 
     r = session.post(url+'/', data=auth)
-    print r.status_code
     assert r.status_code/100 in (2,3), 'fail to send auth credentials'
     assert not re.search(error_regex, r.content), 'error displayed on auth'
 
