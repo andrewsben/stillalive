@@ -14,29 +14,31 @@ def dash(url, tenant='admin', user='admin', password='secrete'):
     login_regex = re.compile("auth")
     error_regex = re.compile("Error")
 
-    r = session.get(url+'/auth/login/')
+    r = session.get(url+'/')
     assert r.status_code == 200, 'unable to access login page'
     assert not re.match(error_regex, r.content), 'error displayed on login page'
 
     match = re.search(crsf_regex, r.content)
+    csrf = match.groups(1)[0]
     assert match, 'Unable to find CRSF token'
 
-    auth = {'csrfmiddlewaretoken': match.groups(1)[0],
+    auth = {'csrfmiddlewaretoken': csrf,
             'method': 'Login',
             'username': user,
             'password': password}
 
-    r = session.post(url+'/auth/login/', data=auth)
-    assert r.status_code == 200, 'fail to send auth credentials'
+    r = session.post(url+'/', data=auth)
+    print r.status_code
+    assert r.status_code/100 in (2,3), 'fail to send auth credentials'
     assert not re.search(error_regex, r.content), 'error displayed on auth'
 
-    r = session.get(url+'/dash/')
+    r = session.get(url+'/nova/')
     assert r.status_code == 200, 'fail to access user dash'
     assert not re.search(login_regex, r.url), 'user dash fail (redirected to login)'
     assert not re.search(error_regex, r.content), 'error displayed on user dash'
 
-    r = session.get(url+'/dash/%s/images/' % tenant)
-    assert r.status_code == 200, 'fail to access dash/images'
+    r = session.get(url+'/nova/images_and_snapshots/')
+    assert r.status_code == 200, 'fail to access images'
     assert not re.search(login_regex, r.url), 'images fail (redirected to login)'
     assert not re.search(error_regex, r.content), '(glance?) error displayed'
 
