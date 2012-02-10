@@ -9,6 +9,7 @@ import sys
 
 def dash(url, tenant='admin', user='admin', password='secrete'):
     session = requests.session()
+    region = 'http://127.0.0.1:5000/v2.0'
 
     crsf_regex = re.compile("name='csrfmiddlewaretoken' value='([^']*)'")
     login_regex = re.compile("auth")
@@ -25,7 +26,8 @@ def dash(url, tenant='admin', user='admin', password='secrete'):
     auth = {'csrfmiddlewaretoken': csrf,
             'method': 'Login',
             'username': user,
-            'password': password}
+            'password': password,
+            'region': region}
 
     r = session.post(url+'/', data=auth)
     assert r.status_code/100 in (2,3), 'fail to send auth credentials'
