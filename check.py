@@ -7,8 +7,10 @@ import sys
 # FIXME(ja): unsure how to set timeout in newer versions of requests
 #requests.settings(timeout=5.0)
 
-def dash(url, tenant='admin', user='admin', password='secrete'):
+def dash(url, tenant='admin', user='admin', password='secrete', region=False):
     session = requests.session()
+    if not region:
+        region = 'http://127.0.0.1:5000/v2.0'
 
     crsf_regex = re.compile("name='csrfmiddlewaretoken' value='([^']*)'")
     login_regex = re.compile("auth")
@@ -25,7 +27,8 @@ def dash(url, tenant='admin', user='admin', password='secrete'):
     auth = {'csrfmiddlewaretoken': csrf,
             'method': 'Login',
             'username': user,
-            'password': password}
+            'password': password,
+            'region': region}
 
     r = session.post(url+'/', data=auth)
     assert r.status_code/100 in (2,3), 'fail to send auth credentials'
@@ -50,13 +53,15 @@ def dash(url, tenant='admin', user='admin', password='secrete'):
 if __name__ == '__main__':
     host = sys.argv[1]
     url = 'http://' + host
-    tenant = user = password = None
-    if len(sys.argv) >= 2:
-        tenant = sys.argv[2]
+    tenant = user = password = region = None
     if len(sys.argv) >= 3:
-        user = sys.argv[3]
+        tenant = sys.argv[2]
     if len(sys.argv) >= 4:
+        user = sys.argv[3]
+    if len(sys.argv) >= 5:
         password = sys.argv[4]
-
-    dash(url, tenant, user, password)
+    print len(sys.argv)    
+    if len(sys.argv) >= 6:
+        region = sys.argv[5]
+    dash(url, tenant, user, password, region)
     print "success"
